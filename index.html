@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
+    <title>Gramps Addons</title>
+</head>
+
+<body>
+    <div class="bg-image mb-4 shadow-lg"
+        style="background-image: url(img/header.jpg); background-size: cover;">
+        <div class="mask p-3 shadow-1-strong text-white" style="background-color: rgba(0, 0, 0, 0.4);">
+            <div class="container-md p-md-5 p-2" style="min-width: 20rem; max-width: 50rem;">
+                <h1 class="display-3 fw-bolder text-center">Gramps Addons</h1>
+                <p class="lead text-center mb-2">Filter available addons for open-source genealogy program <a
+                        class="link-light" href="https://gramps-project.org/blog/">Gramps</a>. You can download them for
+                    manual installation in the
+                    <a class="link-light"
+                        href="https://gramps-project.org/wiki/index.php/Gramps_5.1_Wiki_Manual_-_User_Directory">Gramps
+                        user directory</a>.
+                    All avaiable languages are listed but only some addons have translated descriptions.
+                </p>
+                <p class="text-center mb-2">
+                    <a class="link-light me-2" href="https://github.com/Mattkmmr">Author</a>
+                    <a class="link-light" href="https://github.com/Mattkmmr/gramps-addons-listings">Source Code</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-md" style="min-width: 20rem; max-width: 40rem;">
+        <div>
+            <div class="form-floating mb-2 shadow-sm">
+                <select id="select_version" class="form-select">
+                    <option value="gramps42">4.2</option>
+                    <option value="gramps50">5.0</option>
+                    <option value="gramps51" selected>5.1</option>
+                    <option value="gramps52">5.2</option>
+                </select>
+                <label for="select_version">Gramps Version</label>
+            </div>
+            <div class="form-floating mb-2 shadow-sm">
+                <select id="select_language" class="form-select"></select>
+                <label for="select_language">Language</label>
+            </div>
+            <div class="form-floating mb-2 shadow-sm">
+                <select id="select_category" class="form-select">
+                    <option value="All" selected>All</option>
+                </select>
+                <label for="select_category">Addon Category</label>
+            </div>
+            <div class="d-grid mb-4">
+                <div id="search" class="btn btn-primary btn-lg shadow" style="border-radius: 0rem;">Search</div>
+            </div>
+        </div>
+    </div>
+    <div id="root" class="container-lg">
+        <div id="content" class="row mb-4 g-0"></div>
+    </div>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+        crossorigin="anonymous"></script>
+    <script src="js/languages.js"></script>
+    <script src="js/main.js"></script>
+</body>
+
+</html>
