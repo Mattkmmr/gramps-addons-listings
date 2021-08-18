@@ -4,10 +4,9 @@ function replaceInString(fullString, search, replacement) {
     return fullString.split(search).join(replacement);
 }
 
-function create_entry(element) {
+function create_entry(element, step) {
     let category = document.getElementById("select_category").value;
     let item = false;
-
     // Error handling for SyntaxError and parsing errors because gramps addon listings aren't JSON
     try {
         item = JSON.parse(element);
@@ -41,6 +40,14 @@ function create_entry(element) {
         card_tag3.setAttribute("class", "badge bg-secondary bi bi-diagram-3-fill");
         card_tag3.innerText = " " + item.g;
 
+        let card_tag4 = document.createElement("span");
+        card_tag4.setAttribute("class", "badge bg-primary me-1");
+        if (step === "gramps") {
+            card_tag4.innerText = "Gramps";
+        } else if (step === "isotammi") {
+            card_tag4.innerText = "Isotammi";
+        }
+
         let card_desc = document.createElement("div");
         card_desc.setAttribute("class", "mb-2");
         card_desc.innerText = item.d;
@@ -48,14 +55,19 @@ function create_entry(element) {
         let card_row_download = document.createElement("div");
         card_row_download.setAttribute("class", "text-center");
 
-        let card_download = document.createElement("a");
-        card_download.setAttribute("class", "btn btn-outline-primary btn-sm col-6");
-        card_download.setAttribute("href", "https://github.com/gramps-project/addons/raw/master/gramps51/download/" + item.z);
-        card_download.innerText = "Download"
-        card_download.style.borderRadius = "0rem";
+        let card_download_btn = document.createElement("a");
+        card_download_btn.setAttribute("class", "btn btn-outline-primary btn-sm col-6");
+        if (step === "gramps") {
+            card_download_btn.setAttribute("href", "https://github.com/gramps-project/addons/raw/master/gramps51/download/" + item.z);
+        } else if (step === "isotammi") {
+            card_download_btn.setAttribute("href", "https://github.com/Taapeli/isotammi-addons/raw/master/addons/gramps51/download/" + item.z);
+        }
+        card_download_btn.innerText = "Download"
+        card_download_btn.style.borderRadius = "0rem";
 
-        card_row_download.append(card_download)
+        card_row_download.append(card_download_btn)
 
+        card_body.append(card_tag4);
         card_body.append(card_tag1);
         card_body.append(card_tag2);
         card_body.append(card_tag3);
@@ -71,15 +83,14 @@ function create_entry(element) {
     }
 }
 
-function show_entries(data) {
-
+function show_entries(data, reset, current_step) {
     let the_content = document.getElementById("content");
-    if (the_content.children.length > 0) {
+    if (reset && the_content.children.length > 0) {
         the_content.innerHTML = ''
     }
     data.forEach(element => {
         if (element !== "") {
-            let entry = create_entry(element)
+            let entry = create_entry(element, current_step)
             if (entry !== 0) {
                 the_content.append(entry);
             }
@@ -88,8 +99,7 @@ function show_entries(data) {
 };
 
 function update_language() {
-    let version = document.getElementById("select_version").value;
-    // let languages = "js/languages.js"
+    // languages from languages.js
     languages.forEach(item => {
         let option = document.createElement("option");
         option.value = item[0];
@@ -105,21 +115,56 @@ function update_language() {
     })
 }
 
+function get_gramps_data(url_gramps) {
+    return fetch(url_gramps)
+        .then(response =>
+            response.text()
+            // gramps listings aren't JSON, remove chars causing parsing errors
+                .then(txt => replaceInString(txt, ":'", ':"'))
+                .then(txt => replaceInString(txt, "',", '",'))
+                .then(txt => replaceInString(txt, "'}", '"}'))
+                .then(txt => replaceInString(txt, ' "', ''))
+                .then(txt => replaceInString(txt, '" ', ''))
+                .then(txt => replaceInString(txt, "\\'", ''))
+                .then(txt => txt.split(/\r\n|\n|\r/)));
+}
+
+function get_isotammi_data(url_isotammi) {
+    return fetch(url_isotammi)
+        .then(response =>
+            response.text()
+            // isotammi listings aren't JSON, remove chars causing parsing errors
+                .then(txt => replaceInString(txt, "{'", '{"'))
+                .then(txt => replaceInString(txt, ": '", ': "'))
+                .then(txt => replaceInString(txt, "':", '":'))
+                .then(txt => replaceInString(txt, "',", '",'))
+                .then(txt => replaceInString(txt, ", '", ', "'))
+                .then(txt => replaceInString(txt, "'}", '"}'))
+                .then(txt => txt.split(/\r\n|\n|\r/)));
+}
+
 function fetch_data() {
+    let project = document.getElementById("select_project").value
     let gramps_version = document.getElementById("select_version").value
     let gramps_language = document.getElementById("select_language").value
-    let url = `https://raw.githubusercontent.com/gramps-project/addons/master/${gramps_version}/listings/addons-${gramps_language}.txt`;
-    fetch(url)
-        .then(response => response.text())
-        // gramps addon listings aren't JSON => replace chars causing parsing errors
-        .then(txt => replaceInString(txt, ":'", ':"'))
-        .then(txt => replaceInString(txt, "',", '",'))
-        .then(txt => replaceInString(txt, "'}", '"}'))
-        .then(txt => replaceInString(txt, ' "', ''))
-        .then(txt => replaceInString(txt, '" ', ''))
-        .then(txt => replaceInString(txt, "\\'", ''))
-        .then(txt => txt.split(/\r\n|\n|\r/))
-        .then(show_entries);
+    let languages_isotammi = ["en", "fi", "sv"];  // languages supported by isotammi
+    let url_gramps = `https://raw.githubusercontent.com/gramps-project/addons/master/${gramps_version}/listings/addons-${gramps_language}.txt`;
+    let url_isotammi = `https://raw.githubusercontent.com/Taapeli/isotammi-addons/master/addons/${gramps_version}/listings/addons-en.txt`;
+
+    // update language if supported by isotammi, else fallback to english
+    if (languages_isotammi.includes(gramps_language)) {
+        url_isotammi = `https://raw.githubusercontent.com/Taapeli/isotammi-addons/master/addons/${gramps_version}/listings/addons-${gramps_language}.txt`;
+    }
+
+    // fetch data and create entries
+    if (project === "all") {
+        get_gramps_data(url_gramps).then(data => show_entries(data, true, "gramps"));
+        get_isotammi_data(url_isotammi).then(data => show_entries(data, false, "isotammi"));
+    } else if (project === "gramps") {
+        get_gramps_data(url_gramps).then(data => show_entries(data, true, "gramps"));
+    } else if (project === "isotammi") {
+        get_isotammi_data(url_isotammi).then(data => show_entries(data, true, "isotammi"));
+    }
 }
 
 function main() {
