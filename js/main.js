@@ -56,16 +56,47 @@ function create_entry(element, step) {
         card_row_download.setAttribute("class", "text-center");
 
         let card_download_btn = document.createElement("a");
-        card_download_btn.setAttribute("class", "btn btn-outline-primary btn-sm col-6");
+        card_download_btn.setAttribute("class", "btn btn-outline-primary btn-sm col-4 me-2");
         if (step === "gramps") {
             card_download_btn.setAttribute("href", "https://github.com/gramps-project/addons/raw/master/gramps51/download/" + item.z);
         } else if (step === "isotammi") {
             card_download_btn.setAttribute("href", "https://github.com/Taapeli/isotammi-addons/raw/master/addons/gramps51/download/" + item.z);
         }
-        card_download_btn.innerText = "Download"
         card_download_btn.style.borderRadius = "0rem";
 
-        card_row_download.append(card_download_btn)
+        let card_wiki_btn = document.createElement("a");
+        card_wiki_btn.setAttribute("class", "btn btn-outline-secondary btn-sm col-4 disabled");
+        card_wiki_btn.style.borderRadius = "0rem";
+
+        wiki_links.forEach(element => {
+            if (element.i === item.i && element.w !== ""){
+                card_wiki_btn.setAttribute("href", "https://gramps-project.org/wiki/index.php/" + element.w);
+                card_wiki_btn.classList.remove("disabled");
+                card_wiki_btn.classList.remove("btn-outline-secondary");
+                card_wiki_btn.classList.add("btn-outline-primary");
+            }
+        })
+
+        let dowload_icon = document.createElement("span");
+        dowload_icon.setAttribute("class", "bi bi-arrow-down-square-fill me-1");
+
+        let download_text = document.createElement("span");
+        download_text.innerText = "Download";
+
+        let wiki_icon = document.createElement("span");
+        wiki_icon.setAttribute("class", "bi bi-globe me-1");
+
+        let wiki_text = document.createElement("span");
+        wiki_text.innerText = "Wiki";
+
+        card_download_btn.append(dowload_icon);
+        card_download_btn.append(download_text);
+
+        card_wiki_btn.append(wiki_icon);
+        card_wiki_btn.append(wiki_text);
+
+        card_row_download.append(card_download_btn);
+        card_row_download.append(card_wiki_btn);
 
         card_body.append(card_tag4);
         card_body.append(card_tag1);
