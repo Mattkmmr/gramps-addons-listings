@@ -4,15 +4,9 @@ function replaceInString(fullString, search, replacement) {
     return fullString.split(search).join(replacement);
 }
 
-function create_entry(element, step) {
+function create_entry(item, step) {
     let category = document.getElementById("select_category").value;
-    let item = false;
-    // Error handling for SyntaxError and parsing errors because gramps addon listings aren't JSON
-    try {
-        item = JSON.parse(element);
-    } catch (err) {
-        // console.log("SyntaxError: Unable to parse: " + element);
-    }
+    let selected_language = document.getElementById("select_language").value
 
     if (item && (category === "All" || item.t === category)) {
         let card_item = document.createElement("div");
@@ -24,7 +18,13 @@ function create_entry(element, step) {
 
         let card_header = document.createElement("div");
         card_header.setAttribute("class", "fw-bold");
-        card_header.innerText = item.n;
+        card_header.innerText = item.n2;
+
+        let card_subheader = document.createElement("div");
+        card_subheader.setAttribute("class", "text-secondary");
+        if (selected_language !== "en") {
+            card_subheader.innerText = item.n
+        }
 
         let card_body = document.createElement("div");
 
@@ -50,7 +50,7 @@ function create_entry(element, step) {
 
         let card_desc = document.createElement("div");
         card_desc.setAttribute("class", "mb-2");
-        card_desc.innerText = item.d;
+        card_desc.innerText = item.d2;
 
         let card_row_download = document.createElement("div");
         card_row_download.setAttribute("class", "text-center");
@@ -68,8 +68,9 @@ function create_entry(element, step) {
         card_wiki_btn.setAttribute("class", "btn btn-outline-secondary btn-sm col-4 disabled");
         card_wiki_btn.style.borderRadius = "0rem";
 
+        // wiki_links from wiki.js
         wiki_links.forEach(element => {
-            if (element.i === item.i && element.w !== ""){
+            if (element.i === item.i && element.w !== "") {
                 card_wiki_btn.setAttribute("href", "https://gramps-project.org/wiki/index.php/" + element.w);
                 card_wiki_btn.classList.remove("disabled");
                 card_wiki_btn.classList.remove("btn-outline-secondary");
@@ -106,6 +107,9 @@ function create_entry(element, step) {
         card_body.append(card_row_download);
 
         card_inner.append(card_header);
+        if (selected_language !== "en") {
+            card_inner.append(card_subheader);
+        }
         card_inner.append(card_body);
         card_item.append(card_inner);
         return card_item
@@ -120,11 +124,9 @@ function show_entries(data, reset, current_step) {
         the_content.innerHTML = ''
     }
     data.forEach(element => {
-        if (element !== "") {
-            let entry = create_entry(element, current_step)
-            if (entry !== 0) {
-                the_content.append(entry);
-            }
+        let entry = create_entry(element, current_step)
+        if (entry !== 0) {
+            the_content.append(entry);
         }
     });
 };
@@ -146,56 +148,113 @@ function update_language() {
     })
 }
 
-function get_gramps_data(url_gramps) {
-    return fetch(url_gramps)
-        .then(response =>
-            response.text()
-            // gramps listings aren't JSON, remove chars causing parsing errors
-                .then(txt => replaceInString(txt, ":'", ':"'))
-                .then(txt => replaceInString(txt, "',", '",'))
-                .then(txt => replaceInString(txt, "'}", '"}'))
-                .then(txt => replaceInString(txt, ' "', ''))
-                .then(txt => replaceInString(txt, '" ', ''))
-                .then(txt => replaceInString(txt, "\\'", ''))
-                .then(txt => txt.split(/\r\n|\n|\r/)));
+function get_gramps_data(txt) {
+    // gramps listings aren't JSON, remove chars causing parsing errors
+    txt = replaceInString(txt, ":'", ':"');
+    txt = replaceInString(txt, "',", '",');
+    txt = replaceInString(txt, "'}", '"}');
+    txt = replaceInString(txt, ' "N', 'N');
+    txt = replaceInString(txt, '" ', '');
+    txt = replaceInString(txt, " '", '"');
+    txt = replaceInString(txt, "\\'", '');
+    return txt.split(/\r\n|\n|\r/);
 }
 
-function get_isotammi_data(url_isotammi) {
-    return fetch(url_isotammi)
-        .then(response =>
-            response.text()
-            // isotammi listings aren't JSON, remove chars causing parsing errors
-                .then(txt => replaceInString(txt, "{'", '{"'))
-                .then(txt => replaceInString(txt, ": '", ': "'))
-                .then(txt => replaceInString(txt, "':", '":'))
-                .then(txt => replaceInString(txt, "',", '",'))
-                .then(txt => replaceInString(txt, ", '", ', "'))
-                .then(txt => replaceInString(txt, "'}", '"}'))
-                .then(txt => txt.split(/\r\n|\n|\r/)));
+function get_isotammi_data(txt) {
+    // isotammi listings aren't JSON, remove chars causing parsing errors
+    txt = replaceInString(txt, "{'", '{"');
+    txt = replaceInString(txt, ": '", ': "');
+    txt = replaceInString(txt, "':", '":');
+    txt = replaceInString(txt, "',", '",');
+    txt = replaceInString(txt, ", '", ', "');
+    txt = replaceInString(txt, "'}", '"}');
+    return txt.split(/\r\n|\n|\r/);
+}
+
+function data_text_to_json(arr1, arr2) {
+    let arr_json1 = [];
+    let arr_json2 = [];
+
+    // arr1 to JSON
+    arr1.forEach(element => {
+        if (element != "") {
+            let item = false;
+            try {
+                item = JSON.parse(element);
+            } catch (err) {
+                // console.log(err);
+                item = { "t": "", "i": "", "n": "", "v": "", "g": "", "d": "", "z": "" }
+            }
+            if (item) {
+                arr_json1.push(item);
+            }
+        }
+    });
+
+    // arr2 to JSON
+    arr2.forEach(element => {
+        if (element != "") {
+            let item = false;
+            try {
+                item = JSON.parse(element);
+            } catch (err) {
+                // console.log(err);
+                item = { "t": "", "i": "", "n": "", "v": "", "g": "", "d": "", "z": "" }
+            }
+            if (item) {
+                arr_json2.push(item);
+            }
+        }
+    });
+
+    // combine both JSON arrays
+    let selected_language = document.getElementById("select_language").value
+    for (let i = 0; i < arr_json1.length; i++) {
+        const e1 = arr_json1[i];
+        const e2 = arr_json2[i];
+        e1.d2 = e2.d;
+        e1.n2 = e2.n;
+    }
+    return arr_json1;
 }
 
 function fetch_data() {
     let project = document.getElementById("select_project").value
-    let gramps_version = document.getElementById("select_version").value
-    let gramps_language = document.getElementById("select_language").value
+    let selected_version = document.getElementById("select_version").value
+    let selected_language = document.getElementById("select_language").value
     let languages_isotammi = ["en", "fi", "sv"];  // languages supported by isotammi
-    let url_gramps = `https://raw.githubusercontent.com/gramps-project/addons/master/${gramps_version}/listings/addons-${gramps_language}.txt`;
-    let url_isotammi = `https://raw.githubusercontent.com/Taapeli/isotammi-addons/master/addons/${gramps_version}/listings/addons-en.txt`;
-
-    // update language if supported by isotammi, else fallback to english
-    if (languages_isotammi.includes(gramps_language)) {
-        url_isotammi = `https://raw.githubusercontent.com/Taapeli/isotammi-addons/master/addons/${gramps_version}/listings/addons-${gramps_language}.txt`;
+    let url_gramps_1 = `https://raw.githubusercontent.com/gramps-project/addons/master/${selected_version}/listings/addons-en.txt`;
+    let url_gramps_2 = `https://raw.githubusercontent.com/gramps-project/addons/master/${selected_version}/listings/addons-${selected_language}.txt`;
+    let url_isotammi_1 = `https://raw.githubusercontent.com/Taapeli/isotammi-addons/master/addons/${selected_version}/listings/addons-en.txt`;
+    let url_isotammi_2 = `https://raw.githubusercontent.com/Taapeli/isotammi-addons/master/addons/${selected_version}/listings/addons-en.txt`;
+    if (languages_isotammi.includes(selected_language)) {
+        url_isotammi_2 = `https://raw.githubusercontent.com/Taapeli/isotammi-addons/master/addons/${selected_version}/listings/addons-${selected_language}.txt`;
     }
 
-    // fetch data and create entries
-    if (project === "all") {
-        get_gramps_data(url_gramps).then(data => show_entries(data, true, "gramps"));
-        get_isotammi_data(url_isotammi).then(data => show_entries(data, false, "isotammi"));
-    } else if (project === "gramps") {
-        get_gramps_data(url_gramps).then(data => show_entries(data, true, "gramps"));
-    } else if (project === "isotammi") {
-        get_isotammi_data(url_isotammi).then(data => show_entries(data, true, "isotammi"));
-    }
+    Promise.all([
+        fetch(url_gramps_1).then(res => res.text())
+            .then(txt => get_gramps_data(txt)),
+        fetch(url_gramps_2).then(res => res.text())
+            .then(txt => get_gramps_data(txt)),
+        fetch(url_isotammi_1).then(res => res.text())
+            .then(txt => get_isotammi_data(txt)),
+        fetch(url_isotammi_2).then(res => res.text())
+            .then(txt => get_isotammi_data(txt))
+    ])
+        .then(([gramps_arr1, gramps_arr2, isotammi_arr1, isotammi_arr2]) => {
+            let gramps_json = data_text_to_json(gramps_arr1, gramps_arr2);
+            let isotammi_json = data_text_to_json(isotammi_arr1, isotammi_arr2);
+
+            if (project === "all") {
+                show_entries(gramps_json, true, "gramps");
+                show_entries(isotammi_json, false, "isotammi");
+            } else if (project === "gramps") {
+                show_entries(gramps_json, true, "gramps");
+            } else if (project === "isotammi") {
+                show_entries(isotammi_json, true, "isotammi");
+            }
+        });
+    // });
 }
 
 function main() {
