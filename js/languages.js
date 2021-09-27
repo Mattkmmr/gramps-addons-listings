@@ -8,7 +8,7 @@ var languages = [
     ["de", "German", "Deutsch"],
     ["el", "Greek", "ελληνικά"],
     ["en", "English", "English"],
-    ["en_GB", "English (Great Britain)", "English (Great Britain)"],
+    // ["en_GB", "English (Great Britain)", "English (Great Britain)"],
     ["eo", "Esperanto", "Esperanto"],
     ["es", "Spanish", "Español"],
     ["fi", "Finnish", "suomi"],
@@ -25,8 +25,9 @@ var languages = [
     ["nl", "Dutch", "Nederlands"],
     ["nn", "Norwegian", "Norsk"],
     ["pl", "Polish", "polszczyzna"],
-    ["pt_BR", "Portuguese (Brazil)", "Português"],
-    ["pt_PT", "Portuguese (Portugal)", "Português"],
+    // ["pt_BR", "Portuguese (Brazil)", "Português"],
+    // ["pt_PT", "Portuguese (Portugal)", "Português"],
+    ["pt_PT", "Portuguese", "Português"],
     ["ro", "Romanian", "Română"],
     ["ru", "Russian", "русский"],
     ["sk", "Slovak", "Slovenčina"],
@@ -37,7 +38,8 @@ var languages = [
     ["tr", "Turkish", "Türkçe"],
     ["uk", "Ukrainian", "Українська"],
     ["vi", "Vietnamese", "Tiếng Việt"],
-    ["zh_CN", "Chinese (China)", "中文"],
-    ["zh_HK", "Chinese (Hong Kong)", "中文"],
-    ["zh_TW", "Chinese (Taiwan)", "中文"]
+    // ["zh_CN", "Chinese (China)", "中文"],
+    // ["zh_HK", "Chinese (Hong Kong)", "中文"],
+    // ["zh_TW", "Chinese (Taiwan)", "中文"],
+    ["zh_TW", "Chinese", "中文"]
 ]

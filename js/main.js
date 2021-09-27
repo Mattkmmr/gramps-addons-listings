@@ -123,7 +123,7 @@ function show_entries(data, reset, current_step) {
     if (reset && the_content.children.length > 0) {
         the_content.innerHTML = ''
     }
-    data.forEach(element => {
+    data.sort((a, b) => a.n.localeCompare(b.n)).forEach(element => {
         let entry = create_entry(element, current_step)
         if (entry !== 0) {
             the_content.append(entry);
