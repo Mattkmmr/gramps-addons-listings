@@ -31,7 +31,7 @@
     </div>
 
     <div class="container-md" style="min-width: 20rem; max-width: 40rem;">
-        <div class="btn-toolbar mb-2">
+        <div class="btn-toolbar flex-nowrap mb-2">
             <div class="form-floating shadow-sm flex-fill  me-2">
                 <select id="select_project" class="form-select">
                     <option value="all" selected>All</option>
@@ -45,7 +45,7 @@
                     class="bi bi-info-circle-fill"></i></button>
         </div>
 
-        <div class="btn-toolbar mb-2">
+        <div class="btn-toolbar flex-nowrap mb-2">
             <div class="form-floating shadow-sm flex-fill me-2">
                 <select id="select_version" class="form-select">
                     <option value="gramps50">5.0 (outdated)</option>
@@ -55,11 +55,11 @@
                 <label for="select_version">Gramps Version</label>
             </div>
             <button type="button" class="btn btn-lg btn-secondary" data-bs-toggle="popover" data-bs-trigger="focus" data-bs-html="true"
-                data-bs-content="Select your installed Gramps version. If you have an outdated version installed, please consider an upgrade to the current version.<div><a href='https://www.gramps-project.org/wiki/index.php/Previous_releases_of_Gramps'>Realeases history</a><div><div><a href='https://www.gramps-project.org/wiki/index.php?title=Download'>Download Gramps</a><div>"><i
+                data-bs-content="Select your installed Gramps version. If you have an outdated version installed, please consider an upgrade to the current version.<div><a class='me-2' href='https://www.gramps-project.org/wiki/index.php/Previous_releases_of_Gramps'>Release history</a><a href='https://github.com/gramps-project/gramps'>Gramps code</a></div><div>Download: <a class='me-2' href='https://www.gramps-project.org/wiki/index.php?title=Download'>Current</a><a href='https://sourceforge.net/projects/gramps/files/Stable/'>All versions</a></div>"><i
                     class="bi bi-info-circle-fill"></i></button>
         </div>
 
-        <div class="btn-toolbar mb-2">
+        <div class="btn-toolbar flex-nowrap mb-2">
             <div class="form-floating shadow-sm flex-fill me-2">
                 <select id="select_language" class="form-select"></select>
                 <label for="select_language">Language</label>
@@ -68,7 +68,7 @@
                 data-bs-content="Select a language for displaying addon names and descriptions. Not all languages provide translated names and descriptions yet."><i class="bi bi-info-circle-fill"></i></button>
         </div>
 
-        <div class="btn-toolbar mb-2">
+        <div class="btn-toolbar flex-nowrap mb-2">
             <div class="form-floating shadow-sm flex-fill me-2">
                 <select id="select_category" class="form-select">
                     <option value="All" selected>All</option>

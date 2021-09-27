@@ -56,7 +56,7 @@ function create_entry(item, step) {
         card_row_download.setAttribute("class", "text-center");
 
         let card_download_btn = document.createElement("a");
-        card_download_btn.setAttribute("class", "btn btn-outline-primary btn-sm col-4 me-2");
+        card_download_btn.setAttribute("class", "btn btn-outline-primary btn-sm col-4 text-nowrap me-2");
         if (step === "gramps") {
             card_download_btn.setAttribute("href", "https://github.com/gramps-project/addons/raw/master/gramps51/download/" + item.z);
         } else if (step === "isotammi") {
@@ -65,7 +65,7 @@ function create_entry(item, step) {
         card_download_btn.style.borderRadius = "0rem";
 
         let card_wiki_btn = document.createElement("a");
-        card_wiki_btn.setAttribute("class", "btn btn-outline-secondary btn-sm col-4 disabled");
+        card_wiki_btn.setAttribute("class", "btn btn-outline-secondary btn-sm col-4 text-nowrap disabled");
         card_wiki_btn.style.borderRadius = "0rem";
 
         // wiki_links from wiki.js
