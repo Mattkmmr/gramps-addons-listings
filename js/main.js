@@ -5,20 +5,29 @@ function replaceInString(fullString, search, replacement) {
 }
 
 function create_entry(item, step) {
+
     let category = document.getElementById("select_category").value;
     let selected_language = document.getElementById("select_language").value
 
     if (item && (category === "All" || item.t === category)) {
         let card_item = document.createElement("div");
-        card_item.setAttribute("class", "col col-12 col-md-6 col-xl-4 px-2 pb-3");
+        card_item.setAttribute("id", item.i);
+        card_item.setAttribute("class", "mycard col col-12 col-md-6 col-xl-4 px-2 pb-3");
         card_item.style.minWidth = "20rem";
 
         let card_inner = document.createElement("div");
-        card_inner.setAttribute("class", "border shadow p-3 h-100");
+        card_inner.setAttribute("class", "border shadow p-3 h-100 d-flex flex-column");
 
         let card_header = document.createElement("div");
         card_header.setAttribute("class", "fw-bold");
-        card_header.innerText = item.n2;
+        let header_link = document.createElement("a");
+        header_link.setAttribute("href", "#" + item.i);
+        header_link.setAttribute("class", "text-dark text-decoration-none");
+        header_link.addEventListener("click", x => {
+            highlight_card(item.i);
+        });
+        header_link.innerText = item.n2;
+        card_header.append(header_link);
 
         let card_subheader = document.createElement("div");
         card_subheader.setAttribute("class", "text-secondary");
@@ -27,6 +36,7 @@ function create_entry(item, step) {
         }
 
         let card_body = document.createElement("div");
+        card_body.setAttribute("class", "mb-auto");
 
         let card_tag1 = document.createElement("span");
         card_tag1.setAttribute("class", "badge bg-dark me-1");
@@ -104,13 +114,13 @@ function create_entry(item, step) {
         card_body.append(card_tag2);
         card_body.append(card_tag3);
         card_body.append(card_desc);
-        card_body.append(card_row_download);
 
         card_inner.append(card_header);
         if (selected_language !== "en") {
             card_inner.append(card_subheader);
         }
         card_inner.append(card_body);
+        card_inner.append(card_row_download);
         card_item.append(card_inner);
         return card_item
     } else {
@@ -218,6 +228,35 @@ function data_text_to_json(arr1, arr2) {
     return arr_json1;
 }
 
+function highlight_card(clicked_item) {
+
+    // check for a item_id anchor in url
+    let url_item = window.location.hash.substr(1);
+    if (clicked_item === "" && url_item === "") {return false}
+
+    // check if the item is in DOM
+    let card_item = null;
+    if (clicked_item !== ""){
+        card_item = document.getElementById(clicked_item)
+    } else {
+        card_item = document.getElementById(decodeURI(url_item));
+    }
+    if (card_item === null) { return false}
+
+    // check adding and removing a highlight border
+    if (clicked_item !== "" && url_item !== ""){
+        let old_card = document.getElementById(decodeURI(url_item));
+        if (old_card !== null){
+            old_card.firstChild.setAttribute("class", "border shadow p-3 h-100");
+        }
+        card_item.firstChild.setAttribute("class", "border border-danger shadow p-3 h-100");
+        window.scrollTo(0, card_item.offsetTop);
+    } else {
+        card_item.firstChild.setAttribute("class", "border border-danger shadow p-3 h-100");
+        window.scrollTo(0, card_item.offsetTop);
+    }
+}
+
 function fetch_data() {
     let project = document.getElementById("select_project").value
     let selected_version = document.getElementById("select_version").value
@@ -253,8 +292,9 @@ function fetch_data() {
             } else if (project === "isotammi") {
                 show_entries(isotammi_json, true, "isotammi");
             }
+        }).then(x => {
+            highlight_card("")
         });
-    // });
 }
 
 function main() {
@@ -266,7 +306,7 @@ function main() {
         document.getElementById("select_category").append(option);
     })
     update_language();
-
+    fetch_data();
     document.getElementById("search").onclick = fetch_data;
 }
 
