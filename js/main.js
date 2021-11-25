@@ -354,7 +354,7 @@ function update_url_params(elem, url_parm) {
     const urlParams = get_url_params();
     const value = document.getElementById(elem).value;
     urlParams.set(url_parm, value);
-    let new_url = window.location.origin + "?" + urlParams.toString()
+    let new_url = window.location.origin + "/gramps-addons-listings/" + "?" + urlParams.toString()
     if (hash_param !== "") {
         new_url += "#" + hash_param;
     }
