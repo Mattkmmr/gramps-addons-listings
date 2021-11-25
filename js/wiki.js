@@ -1,4 +1,5 @@
-var wiki_links = [
+"use strict";
+export const wiki_links = [
     {"i":"postgresql", "w":"PostgreSQL"},
     {"i":"Export GEDCOM Extensions", "w":"GEDCOM_Extensions"},
     {"i":"JSON Export", "w":""},

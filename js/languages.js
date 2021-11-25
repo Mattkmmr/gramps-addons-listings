@@ -1,4 +1,5 @@
-var languages = [
+"use strict";
+export const languages = [
     ["ar", "Arabic", "العربية"],
     ["bg", "Bulgarian", "български език"],
     ["br", "Breton", "brezhoneg"],

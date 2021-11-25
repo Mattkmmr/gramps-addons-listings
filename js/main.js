@@ -1,4 +1,6 @@
 "use strict";
+import { languages } from "./languages.js"
+import { wiki_links } from "./wiki.js"
 
 function replaceInString(fullString, search, replacement) {
     return fullString.split(search).join(replacement);
@@ -229,38 +231,43 @@ function data_text_to_json(arr1, arr2) {
 }
 
 function highlight_card(clicked_item) {
-
     // check for a item_id anchor in url
     let url_item = window.location.hash.substr(1);
-    if (clicked_item === "" && url_item === "") {return false}
-
+    if (clicked_item === "" && url_item === "") { return false }
     // check if the item is in DOM
     let card_item = null;
-    if (clicked_item !== ""){
+    if (clicked_item !== "") {
         card_item = document.getElementById(clicked_item)
     } else {
         card_item = document.getElementById(decodeURI(url_item));
     }
-    if (card_item === null) { return false}
-
+    if (card_item === null) { return false }
     // check adding and removing a highlight border
-    if (clicked_item !== "" && url_item !== ""){
+    if (clicked_item !== "" && url_item !== "") {
         let old_card = document.getElementById(decodeURI(url_item));
-        if (old_card !== null){
+        if (old_card !== null) {
             old_card.firstChild.setAttribute("class", "border shadow p-3 h-100");
         }
-        card_item.firstChild.setAttribute("class", "border border-danger shadow p-3 h-100");
+        card_item.firstChild.setAttribute("class", "border border-warning border-3 shadow p-3 h-100");
         window.scrollTo(0, card_item.offsetTop);
     } else {
-        card_item.firstChild.setAttribute("class", "border border-danger shadow p-3 h-100");
+        card_item.firstChild.setAttribute("class", "border border-warning border-3 shadow p-3 h-100");
         window.scrollTo(0, card_item.offsetTop);
     }
 }
 
 function fetch_data() {
-    let project = document.getElementById("select_project").value
+    // Get select element values
+    let selected_project = document.getElementById("select_project").value
     let selected_version = document.getElementById("select_version").value
     let selected_language = document.getElementById("select_language").value
+    // Update url parameter
+    update_url_params("select_project", "proj")
+    update_url_params("select_version", "vers")
+    update_url_params("select_language", "lang")
+    update_url_params("select_category", "catg")
+
+    // Generate links
     let languages_isotammi = ["en", "fi", "sv"];  // languages supported by isotammi
     let url_gramps_1 = `https://raw.githubusercontent.com/gramps-project/addons/master/${selected_version}/listings/addons-en.txt`;
     let url_gramps_2 = `https://raw.githubusercontent.com/gramps-project/addons/master/${selected_version}/listings/addons-${selected_language}.txt`;
@@ -284,12 +291,12 @@ function fetch_data() {
             let gramps_json = data_text_to_json(gramps_arr1, gramps_arr2);
             let isotammi_json = data_text_to_json(isotammi_arr1, isotammi_arr2);
 
-            if (project === "all") {
+            if (selected_project === "all") {
                 show_entries(gramps_json, true, "gramps");
                 show_entries(isotammi_json, false, "isotammi");
-            } else if (project === "gramps") {
+            } else if (selected_project === "gramps") {
                 show_entries(gramps_json, true, "gramps");
-            } else if (project === "isotammi") {
+            } else if (selected_project === "isotammi") {
                 show_entries(isotammi_json, true, "isotammi");
             }
         }).then(x => {
@@ -306,8 +313,64 @@ function main() {
         document.getElementById("select_category").append(option);
     })
     update_language();
-    fetch_data();
+
+    // Load url parameter to select elements
+    update_select_elements("select_project", "proj")
+    update_select_elements("select_version", "vers")
+    update_select_elements("select_language", "lang")
+    update_select_elements("select_category", "catg")
+
+    // Update url hash parameter
+    const hash_param = window.location.hash.substr(1)
+    if (hash_param !== "") {
+        highlight_card(hash_param)
+    }
+
+    // Update url parameter when select element changes
+    document.getElementById("select_project").onchange = function () {
+        update_url_params("select_project", "proj");
+    };
+    document.getElementById("select_version").onchange = function () {
+        update_url_params("select_version", "vers");
+    };
+    document.getElementById("select_language").onchange = function () {
+        update_url_params("select_language", "lang");
+    };
+    document.getElementById("select_category").onchange = function () {
+        update_url_params("select_category", "catg");
+    };
+
+    // Search button callback
     document.getElementById("search").onclick = fetch_data;
+}
+
+function get_url_params() {
+    const queryString = window.location.search;
+    return new URLSearchParams(queryString);
+}
+
+function update_url_params(elem, url_parm) {
+    const hash_param = window.location.hash.substr(1)
+    const urlParams = get_url_params();
+    const value = document.getElementById(elem).value;
+    urlParams.set(url_parm, value);
+    let new_url = window.location.origin + "?" + urlParams.toString()
+    if (hash_param !== "") {
+        new_url += "#" + hash_param;
+    }
+    window.history.pushState("", "", new_url);
+}
+
+function update_select_elements(elem, url_parm) {
+    const urlParams = get_url_params()
+    if (urlParams.has(url_parm)) {
+        const value_list = [...document.getElementById(elem)].map(a => a.value)
+        if (value_list.includes(urlParams.get(url_parm))) {
+            document.getElementById(elem).value = urlParams.get(url_parm);
+        } else {
+            update_url_params(elem, url_parm)
+        }
+    }
 }
 
 document.addEventListener("DOMContentLoaded", main);
